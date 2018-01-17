@@ -13,11 +13,15 @@ def sigmoid(x):
     Return:
     s -- sigmoid(x)
     """
+    def sig(y):
+        if y>0:
+            return 1/(1+np.exp(-y))
+        else:
+            z=np.exp(y)
+            return z/(1+z)
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
-
+    sig = np.vectorize(sig)
+    s = sig(x)
     return s
 
 
@@ -33,10 +37,7 @@ def sigmoid_grad(s):
     Return:
     ds -- Your computed gradient.
     """
-
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    ds = s*(1-s)
 
     return ds
 
@@ -78,4 +79,4 @@ def test_sigmoid():
 
 if __name__ == "__main__":
     test_sigmoid_basic();
-    test_sigmoid()
+#    test_sigmoid()
