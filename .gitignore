@@ -2,3 +2,4 @@
 *datasets
 *.vscode
 *.pyc
+*.env

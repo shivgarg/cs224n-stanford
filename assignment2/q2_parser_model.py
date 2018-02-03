@@ -54,6 +54,9 @@ class ParserModel(Model):
         (Don't change the variable names)
         """
         ### YOUR CODE HERE
+        self.input_placeholder = tf.placeholder(dtype=tf.int32,shape=(None,self.config.n_features))
+        self.labels_placeholder = tf.placeholder(dtype=tf.float32,shape=(None,self.config.n_classes))
+        self.dropout_placeholder = tf.placeholder(dtype=tf.float32,shape=())
         ### END YOUR CODE
 
     def create_feed_dict(self, inputs_batch, labels_batch=None, dropout=0):
@@ -79,6 +82,11 @@ class ParserModel(Model):
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
         ### YOUR CODE HERE
+        feed_dict={}
+        feed_dict[self.input_placeholder] = inputs_batch
+        if labels_batch is not None:
+            feed_dict[self.labels_placeholder] = labels_batch
+        feed_dict[self.dropout_placeholder] = dropout
         ### END YOUR CODE
         return feed_dict
 
@@ -100,6 +108,8 @@ class ParserModel(Model):
             embeddings: tf.Tensor of shape (None, n_features*embed_size)
         """
         ### YOUR CODE HERE
+        embedding = tf.nn.embedding_lookup(self.pretrained_embeddings,self.input_placeholder)
+        embeddings = tf.reshape(embedding,shape=(-1,self.config.embed_size*self.config.n_features))
         ### END YOUR CODE
         return embeddings
 
@@ -126,6 +136,9 @@ class ParserModel(Model):
 
         x = self.add_embedding()
         ### YOUR CODE HERE
+        h = tf.layers.dense(x,self.config.hidden_size,activation=tf.nn.relu,kernel_initializer=xavier_weight_init())
+        h_drop = tf.nn.dropout(h,1-self.dropout_placeholder)
+        pred = tf.layers.dense(h_drop,self.config.n_classes,kernel_initializer=xavier_weight_init())
         ### END YOUR CODE
         return pred
 
@@ -143,6 +156,7 @@ class ParserModel(Model):
             loss: A 0-d tensor (scalar)
         """
         ### YOUR CODE HERE
+        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.labels_placeholder,logits=pred))
         ### END YOUR CODE
         return loss
 
@@ -167,6 +181,8 @@ class ParserModel(Model):
             train_op: The Op for training.
         """
         ### YOUR CODE HERE
+        opti = tf.train.AdamOptimizer(learning_rate = self.config.lr)
+        train_op = opti.minimize(loss)
         ### END YOUR CODE
         return train_op
 
@@ -250,5 +266,5 @@ def main(debug=True):
 
 
 if __name__ == '__main__':
-    main()
+    main(False)
 
