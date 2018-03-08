@@ -7,7 +7,7 @@ import pdb
 import logging
 
 import tensorflow as tf
-from util import ConfusionMatrix, Progbar, minibatches
+from util import ConfusionMatrix, Progbar, minibatches, get_minibatches
 from data_util import get_chunks
 from model import Model
 from defs import LBLS
@@ -110,7 +110,9 @@ class NERModel(Model):
                         # [features, labels]. This makes expanding tuples into arguments (* operator) handy
 
             ### YOUR CODE HERE (2-3 lines)
-
+            for inputs_minibatch in get_minibatches(train_examples,self.config.batch_size):
+                [inputs,lables] = zip(*inputs_minibatch)
+                self.train_on_batch(sess,inputs,lables)
             ### END YOUR CODE
 
             logger.info("Evaluating on development data")
